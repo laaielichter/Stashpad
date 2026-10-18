@@ -8,6 +8,10 @@ All notable changes to Stashpad are listed here. The format follows [Keep a Chan
 
 - Community files: contributing guide, code of conduct, security policy, issue forms and a pull request template.
 
+### Changed
+
+- README rewritten: real session output, quickstart with expected output, safety section, measured eval results, comparison table, FAQ and roadmap.
+
 ## [0.1.0]
 
 First version.
