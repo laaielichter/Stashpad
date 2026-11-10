@@ -39,6 +39,16 @@ test("bad filter values give a clear error", () => {
   assert.throws(() => searchMemories(dir, "x", { kinds: ["idea"] }), /unknown kind/);
 });
 
+test("impossible dates and a since later than until are refused", () => {
+  const dir = store();
+  for (const key of ["since", "until", "asOf"]) {
+    assert.throws(() => listMemories(dir, { [key]: "2026-13-45" }), /real date/);
+    assert.throws(() => searchMemories(dir, "x", { [key]: "2026-02-30" }), /real date/);
+  }
+  assert.throws(() => listMemories(dir, { since: "2026-06-01", until: "2026-01-01" }), /later than --until/);
+  assert.equal(listMemories(dir, { includeEnded: true, since: "2026-01-01", until: "2026-01-01" }).rows.length, 2);
+});
+
 test("explain shows which words matched, including synonyms", async () => {
   const dir = store();
   const { results } = searchMemories(dir, "db backups", { explain: true });

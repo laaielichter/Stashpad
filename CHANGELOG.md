@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- **`search`, `list` and `shown` refuse impossible dates** like `2026-13-45` and a `--since` that is later than `--until` (#46).
 - **Missed searches are counted for `stashpad search --json` too**, so `stashpad misses` sees the searches agents make on the command line (#20).
 - **`stashpad import --format` works as documented** (`jsonl` or `text`) (#21).
 - **Search ignores accents on Latin letters:** `cafe` finds `café` and the other way round. Accents in other writing systems still count (#26).

@@ -81,7 +81,7 @@ function isRealDate(value) {
   return !Number.isNaN(date.getTime()) && date.toISOString().slice(0, 10) === value;
 }
 
-const isDate = (value) =>
+export const isDate = (value) =>
   typeof value === "string" && DATE_PATTERN.test(value) && isRealDate(value);
 
 const isOptionalId = (value) =>

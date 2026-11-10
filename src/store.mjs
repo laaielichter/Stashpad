@@ -19,6 +19,7 @@ import {
   KINDS,
   REQUIRED_KEYS,
   TRUST_BY_SOURCE,
+  isDate,
   isValidId,
   parseMemory,
   validateMemory,
@@ -679,7 +680,6 @@ export function listMemories(dir, options = {}) {
 }
 
 // Ranks memories against the query. total is how many memories were searched.
-const DAY = /^\d{4}-\d{2}-\d{2}$/;
 
 // Filters shared by list and search. Every filter is optional; together they must all hold (AND).
 //   kinds: ["decision", ...]   sourceTypes: ["user", ...]
@@ -687,9 +687,12 @@ const DAY = /^\d{4}-\d{2}-\d{2}$/;
 //   since / until: "YYYY-MM-DD" on valid_from
 function filterEntries(entries, { includeEnded = false, today = todayIso(), kinds = null, sourceTypes = null, asOf = null, since = null, until = null } = {}) {
   for (const [name, value] of [["as-of", asOf], ["since", since], ["until", until]]) {
-    if (value !== null && value !== undefined && !DAY.test(value)) {
-      throw new StoreError(`--${name} must be a date like 2026-10-01, not "${value}".`);
+    if (value !== null && value !== undefined && !isDate(value)) {
+      throw new StoreError(`--${name} must be a real date like 2026-10-01, not "${value}".`);
     }
+  }
+  if (since && until && since > until) {
+    throw new StoreError(`--since ${since} is later than --until ${until}, so nothing can match.`);
   }
   if (kinds) {
     const bad = kinds.filter((k) => !KINDS.includes(k));
