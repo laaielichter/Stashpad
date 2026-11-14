@@ -14,7 +14,7 @@
 
 - **camelCase names are searchable by their plain words:** `getUserProfile` is now tokenised as get / user / profile (and kept whole), so "user profile" finds it. Acronyms such as `parseHTTPResponse` split too, while ordinary title-case words stay whole. Thanks to @17302513901yh-lang! (#44, #62)
 
-- **A wrong option value exits 2, as the help says:** a bad `--signal`, `--expires-days`, `--kind` or `--source-type` is refused before the store is read, while real store problems keep exit code 1 (#74).
+- **A wrong option value exits 2, as the help says:** a bad `--signal`, `--expires-days`, `--kind` or `--source-type` is refused before the store is read, while real store problems keep exit code 1 Thanks to @bfs2021! (#74, #83)
 
 ## 0.4.0
 
