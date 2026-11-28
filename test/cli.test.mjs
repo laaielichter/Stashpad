@@ -149,6 +149,41 @@ test("a usage error is two lines: the message and a pointer to --help (#71)", as
   }
 });
 
+test("a wrong --kind, --source-type, --valid-from or --expires is a usage error (#133)", async () => {
+  const dir = freshDir();
+  // Build argv directly (saveArgs() already sets --kind fact / --source-type
+  // user, so a bad value must replace the good one, not be appended after it).
+  const base = (id, kind, sourceType, extra = []) => [
+    "save", id, "--dir", dir,
+    "--kind", kind, "--source-type", sourceType,
+    "--source-ref", "test statement", "--text", "x",
+    ...extra,
+  ];
+  for (const [args, message] of [
+    [base("bad-kind", "bogus", "user"), /unknown kind "bogus"/],
+    [base("bad-source-type", "fact", "bogus"), /unknown source type "bogus"/],
+    [base("bad-valid-from", "fact", "user", ["--valid-from", "2026-02-30"]), /--valid-from must be a date like 2026-10-01, not "2026-02-30"/],
+    [base("bad-expires", "fact", "user", ["--expires", "2026-13-01"]), /--expires must be a date like 2026-10-01, not "2026-13-01"/],
+  ]) {
+    const { io, err } = harness();
+    assert.equal(await run(args, io), 2, `${args.join(" ")}: exit 2`);
+    const lines = err.join("\n").split("\n");
+    assert.equal(lines.length, 2, `${args.join(" ")}: message + one pointer line`);
+    assert.match(lines[0], message);
+    assert.match(lines[1], /Run "stashpad --help" for all commands\./);
+  }
+  // Same through decide.
+  const { io, err } = harness();
+  assert.equal(
+    await run(["decide", "use x", "--why", "y", "--expires", "2026-13-01", "--dir", dir], io),
+    2,
+  );
+  assert.match(err.join("\n"), /--expires must be a date like 2026-10-01/);
+  // A good save still works.
+  const good = harness();
+  assert.equal(await run(base("good-save", "fact", "user"), good.io), 0);
+});
+
 test("a typo suggests the closest command, an unrelated word does not (#71)", async () => {
   for (const [typo, expected] of [["serch", "search"], ["reveiw", "review"], ["snapshott", "snapshot"]]) {
     const { io, err } = harness();

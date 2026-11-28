@@ -282,6 +282,22 @@ async function cmdSave(io, dir, id, values) {
     return usageError(io, `save needs: ${missing.map((m) => `--${m}`).join(", ")}`);
   }
 
+  // A wrong option is a typing mistake, not a store problem: say so and
+  // exit 2, the way list/search already do (#133). These messages match
+  // checkFilterValues() so the same mistake reads the same everywhere.
+  if (!KINDS.includes(values.kind)) {
+    return usageError(io, `unknown kind "${values.kind}". Use one of: ${KINDS.join(", ")}.`);
+  }
+  if (!(values["source-type"] in TRUST_BY_SOURCE)) {
+    return usageError(io, `unknown source type "${values["source-type"]}". Use one of: ${Object.keys(TRUST_BY_SOURCE).join(", ")}.`);
+  }
+  if (values["valid-from"] !== undefined && !isValidDay(values["valid-from"])) {
+    return usageError(io, `--valid-from must be a date like 2026-10-01, not "${values["valid-from"]}".`);
+  }
+  if (values.expires !== undefined && !isValidDay(values.expires)) {
+    return usageError(io, `--expires must be a date like 2026-10-01, not "${values.expires}".`);
+  }
+
   const content = values.text === "-" ? await io.readStdin() : values.text;
   // Files are checked before anything is saved; a person's own save is anchored right away.
   const root = projectRoot(dir, io.cwd);
