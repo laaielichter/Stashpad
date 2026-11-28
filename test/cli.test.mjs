@@ -202,7 +202,11 @@ test("number options accept plain digits only, not what Number() coerces", async
   const cases = [
     [["ui", "--port", "", "--dir", dir], /--port must be a whole number/],
     [["ui", "--port", "1e1", "--dir", dir], /--port must be a whole number/],
+    [["ui", "--port", "-5", "--dir", dir], /--port must be a whole number from 0 to 65535/],
     [["search", "x", "--limit", "0x5", "--dir", dir], /--limit must be a whole number/],
+    [["search", "x", "--limit", "-1", "--dir", dir], /--limit must be a whole number from 1 to 100/],
+    [["audit", "--limit", "-1", "--dir", dir], /audit --limit must be a whole number from 1 to 10000/],
+    [["entities", "--limit", "-1", "--dir", dir], /--limit must be a whole number from 1 to 500/],
     [["entities", "--limit", " 3 ", "--dir", dir], /--limit must be a whole number/],
     [["brief", "--max-chars", "1e3", "--dir", dir], /--max-chars must be a whole number/],
     [["handoff", "leave", "--text", "hi", "--expires-days", "1e1", "--dir", dir], /expires-days must be a whole number/],

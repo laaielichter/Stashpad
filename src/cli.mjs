@@ -961,9 +961,20 @@ function joinNegativeNumbers(argv) {
 }
 
 export async function run(argv, io = defaultIo()) {
+  const normalizedArgs = [];
+  for (let i = 0; i < argv.length; i++) {
+    const a = argv[i];
+    if (a.startsWith("--") && !a.includes("=") && i + 1 < argv.length && /^-\d+$/.test(argv[i + 1])) {
+      normalizedArgs.push(`${a}=${argv[i + 1]}`);
+      i++;
+    } else {
+      normalizedArgs.push(a);
+    }
+  }
+
   let parsed;
   try {
-    parsed = parseArgs({ args: argv, options: OPTIONS, allowPositionals: true, strict: true });
+    parsed = parseArgs({ args: normalizedArgs, options: OPTIONS, allowPositionals: true, strict: true });
   } catch (error) {
     if (error.code !== "ERR_PARSE_ARGS_INVALID_OPTION_VALUE") return usageError(io, error.message);
     try {
